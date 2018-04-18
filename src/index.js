@@ -1,3 +1,3 @@
-import HelloWorld from './components/HellowWorld/HellowWorld';
+import HelloWorld from './components/HelloWorld/HelloWorld';
 
 export default HelloWorld;
