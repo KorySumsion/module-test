@@ -1,0 +1,34 @@
+{
+  "name": "module-test",
+  "version": "0.1.0",
+  "private": true,
+  "main": "legacy-build/index.js",
+  "module": "build/index.js",
+  "dependencies": {
+    "foe-hammer": "git+ssh://git@github.com/podium/foe-hammer.git#v2.0.0",
+    "podium-ui": "git+ssh://git@github.com/podium/podium-ui.git#v6.18.2",
+    "urijs": "^1.19.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app-with-legacy": "git+ssh://git@github.com/podium/babel-preset-react-app-with-legacy.git",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.1.1",
+    "styled-components": "^3.1.6"
+  },
+  "peerDependencies": {
+    "react": "^0.14.0 || ^15.0.0 || ^16",
+    "react-dom": "^0.14.0 || ^15.0.0 || ^16",
+    "styled-components": "^2.1.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "npm run babelify:esmodules && npm run babelify:modules && npm run copy-assets",
+    "babelify:esmodules": "BABEL_ENV=development babel src --out-dir build",
+    "babelify:modules": "BABEL_ENV=development LEGACY_BUILD=true babel src --out-dir legacy-build",
+    "copy-assets": "rsync -av --exclude=*.js* src/ build && rsync -av --exclude=*.js* src/ legacy-build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  }
+}

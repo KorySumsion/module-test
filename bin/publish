@@ -1,0 +1,62 @@
+#!/bin/bash
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+
+  case $key in
+    -f|--force)
+      FORCE=true
+      shift # past argument
+      ;;
+    -s|--sign)
+      SIGN=true
+      shift # past argument
+      ;;
+    *)
+      shift # unknown option
+      ;;
+  esac
+done
+
+echo Sign? $SIGN
+echo Force? $FORCE
+
+V=$(cat package.json \
+  | grep version \
+  | head -1 \
+  | awk -F: '{ print $2 }' \
+  | sed 's/[", ]//g')
+
+git checkout --detach
+npm run build
+
+if [ $? -ne 0 ]; then
+  git checkout master
+  exit 1
+fi
+git add -f build
+git add -f legacy-build
+rm -rf .gitignore
+git commit -am "Publish v$V -- with build and legacy-build"
+
+if [ "$FORCE" ]; then
+  git tag -d v$V
+  git push origin :v$V
+fi
+
+if [ "$SIGN" ]; then
+  git tag -s -a v$V -m "v$V"
+else
+  git tag -a v$V -m "v$V"
+fi
+
+git push origin v$V
+
+if [ $? -eq 0 ]; then
+  git tag -d latest
+  git push origin :latest
+
+  git push origin v$V:latest
+fi
+git checkout master

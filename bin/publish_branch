@@ -1,0 +1,24 @@
+#!/bin/bash
+
+BRANCH=$(git symbolic-ref HEAD | sed 's!refs\/heads\/!!')
+
+git checkout --detach
+npm run build
+
+if [ $? -ne 0 ]; then
+  git checkout $BRANCH
+  exit 1
+fi
+git add -f build
+git add -f legacy-build
+rm -rf .gitignore
+git commit -am "Publish b-$BRANCH -- with build and legacy-build"
+
+git tag -d b-$BRANCH
+git push origin :b-$BRANCH
+
+git tag -a b-$BRANCH -m "b-$BRANCH"
+
+git push origin b-$BRANCH
+
+git checkout $BRANCH
